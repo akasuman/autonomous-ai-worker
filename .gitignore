@@ -1,0 +1,19 @@
+# Python / FastAPI
+venv/
+__pycache__/
+*.pyc
+
+# Node.js / Next.js
+node_modules/
+.next/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Secrets
+.env
+
+# Editor / OS specific
+.vscode/
+.idea/
+.DS_Store
