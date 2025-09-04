@@ -3,7 +3,7 @@
 **The Knowledge Vessel is a full-stack web application designed to act as an automated research assistant. It fetches, processes, and summarizes information from the web, providing users with actionable insights on a professional, interactive dashboard.**
 
 ![Dashboard Screenshot](https://ibb.co/ZRbjb2hf) 
-*Note: You will need to take a screenshot of your running application, upload it to a service like Imgur, and replace the URL above.*
+*Note: This is a placeholder URL. You will need to replace it with a real screenshot of your application.*
 
 ---
 ## 🚀 About The Project
@@ -50,31 +50,5 @@ To run this project locally, you will need Git, Python, Node.js, PostgreSQL, and
 
 **1. Clone the Repository:**
 ```bash
-git clone <https://github.com/akasuman/autonomous-ai-worker.git>
-cd <cd ai-knowledge-worker>
-## ▶️ Usage
-
-To run the application, you must have three separate terminals open and running concurrently. Make sure to start them in the following order.
-
-**1. Start the Qdrant Database (in Terminal 1):**
-* From the project root (`Cothon_Project_Final`), start the Docker container:
-    ```bash
-    docker run -p 6333:6333 -p 6334:6334 -v ${PWD}/qdrant_data:/qdrant/storage qdrant/qdrant
-    ```
-
-**2. Start the Backend Server (in Terminal 2):**
-* From the project root, activate the virtual environment and start the Uvicorn server:
-    ```bash
-    .\backend\venv\Scripts\activate
-    uvicorn backend.main:app --reload
-    ```
-
-**3. Start the Frontend Server (in Terminal 3):**
-* From the `frontend` directory, start the Next.js dev server:
-    ```bash
-    cd frontend
-    npm run dev
-    ```
-* Open your browser and navigate to `http://localhost:3000`.
-
----
+git clone [https://github.com/akasuman/autonomous-ai-worker.git](https://github.com/akasuman/autonomous-ai-worker.git)
+cd autonomous-ai-worker
