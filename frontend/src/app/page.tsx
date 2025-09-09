@@ -6,6 +6,8 @@ import Sidebar from "@/components/layout/Sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ResultCard from "@/components/ResultCard";
+import { StockDataCard } from "@/components/StockDataCard";
+import { StockHistoryChart } from "@/components/StockHistoryChart";
 
 interface Article {
   title: string;
@@ -30,26 +32,32 @@ export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  
   const [historyQuery, setHistoryQuery] = useState("");
   const [historyResults, setHistoryResults] = useState<HistoryResult[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  
   const [refreshTrigger, setRefreshTrigger] = useState(false);
+  const [stockSymbol, setStockSymbol] = useState("");
+  const [stockData, setStockData] = useState<any>(null);
+  const [isStockLoading, setIsStockLoading] = useState(false);
+  const [stockError, setStockError] = useState<string | null>(null);
+  const [stockHistory, setStockHistory] = useState([]);
 
   const handleSearch = async () => {
     if (!topic) return;
     setIsLoading(true);
     setSearched(true);
     setArticles([]);
-    setHistoryResults([]);
+    // --- CHANGE: Do not clear history results ---
+    // setHistoryResults([]); 
+    setStockData(null);
+    setStockHistory([]);
     try {
       const response = await fetch(`http://localhost:8000/api/search/${topic}`);
       if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
-      if (data.articles && data.articles.length > 0) {
-        setArticles(data.articles);
-      } else {
-        setArticles([]);
-      }
+      setArticles(data.articles || []);
     } catch (error) {
       console.error("Failed to fetch:", error);
     } finally {
@@ -63,15 +71,13 @@ export default function Home() {
     setSearched(true);
     setArticles([]);
     setHistoryResults([]);
+    setStockData(null);
+    setStockHistory([]);
     try {
       const response = await fetch(`http://localhost:8000/api/tasks/${taskId}`);
       if (!response.ok) throw new Error("Failed to fetch task details");
       const data = await response.json();
-       if (data.articles && data.articles.length > 0) {
-        setArticles(data.articles);
-      } else {
-        setArticles([]);
-      }
+      setArticles(data.articles || []);
     } catch (error) {
       console.error("Failed to fetch task details:", error);
     } finally {
@@ -83,6 +89,10 @@ export default function Home() {
     if (!historyQuery) return;
     setIsHistoryLoading(true);
     setHistoryResults([]);
+     // --- CHANGE: Do not clear article results ---
+    // setArticles([]); 
+    setStockData(null);
+    setStockHistory([]);
     try {
       const response = await fetch(`http://localhost:8000/api/search/history?q=${historyQuery}`);
       if (!response.ok) throw new Error("Network response was not ok");
@@ -95,47 +105,68 @@ export default function Home() {
     }
   };
 
+  const handleStockSearch = async () => {
+    // This function clears all other results, which is the desired behavior
+    if (!stockSymbol) return;
+    setIsStockLoading(true);
+    setStockError(null);
+    setStockData(null);
+    setArticles([]);
+    setHistoryResults([]);
+    setStockHistory([]);
+
+    const symbol = stockSymbol.toUpperCase();
+    try {
+      const [overviewRes, historyRes] = await Promise.all([
+        fetch(`http://localhost:8000/api/stock/${symbol}`),
+        fetch(`http://localhost:8000/api/stock/${symbol}/history`)
+      ]);
+      if (!overviewRes.ok) {
+        const errData = await overviewRes.json();
+        throw new Error(errData.detail || "Stock symbol not found.");
+      }
+      const overviewData = await overviewRes.json();
+      setStockData(overviewData);
+      if (historyRes.ok) {
+        const historyData = await historyRes.json();
+        setStockHistory(historyData);
+      }
+    } catch (err: any) {
+      setStockError(err.message);
+    } finally {
+      setIsStockLoading(false);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-black text-white">
       <Sidebar onTaskSelect={handleTaskSelect} refreshTrigger={refreshTrigger} />
       <main className="flex-1 flex flex-col overflow-y-auto">
         <Header />
         <div className="p-4 space-y-8">
+          {/* Search for New Articles Section */}
           <div>
             <h2 className="text-lg font-semibold mb-2">Search for New Articles</h2>
             <div className="flex w-full max-w-sm items-center space-x-2">
-              <Input
-                type="text"
-                placeholder="Enter a topic to research..."
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                className="bg-gray-900 border-gray-700"
-              />
-              <Button onClick={handleSearch} disabled={isLoading}>
-                {isLoading ? "Searching..." : "Search"}
-              </Button>
+              <Input type="text" placeholder="Enter a topic..." value={topic} onChange={(e) => setTopic(e.target.value)} className="bg-gray-900 border-gray-700" />
+              <Button onClick={handleSearch} disabled={isLoading}>{isLoading ? "Searching..." : "Search News"}</Button>
             </div>
           </div>
+          
+          {/* Search Your Knowledge Base Section */}
           <div>
             <h2 className="text-lg font-semibold mb-2">Search Your Knowledge Base</h2>
             <div className="flex w-full max-w-sm items-center space-x-2">
-              <Input
-                type="text"
-                placeholder="Search past results by meaning..."
-                value={historyQuery}
-                onChange={(e) => setHistoryQuery(e.target.value)}
-                className="bg-gray-900 border-gray-700"
-              />
-              <Button onClick={handleHistorySearch} disabled={isHistoryLoading}>
-                {isHistoryLoading ? "Searching..." : "Search History"}
-              </Button>
+              <Input type="text" placeholder="Search past results by meaning..." value={historyQuery} onChange={(e) => setHistoryQuery(e.target.value)} className="bg-gray-900 border-gray-700" />
+              <Button onClick={handleHistorySearch} disabled={isHistoryLoading}>{isHistoryLoading ? "Searching..." : "Search History"}</Button>
             </div>
+            {/* --- CHANGE: Moved history results display here --- */}
             <div className="mt-4">
-              {isHistoryLoading && <p>Searching history...</p>}
+              {isHistoryLoading && <p>Searching knowledge base...</p>}
               {historyResults.length > 0 && (
                 <div className="p-4 bg-gray-900 rounded-md">
-                   <h3 className="font-semibold mb-2">Similar Past Results:</h3>
-                   <ul className="list-disc pl-5 space-y-2">
+                    <h3 className="font-semibold mb-2">Similar Past Results:</h3>
+                    <ul className="list-disc pl-5 space-y-2">
                       {historyResults.map(result => (
                         <li key={result.id}>
                           <a href={result.payload.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
@@ -144,30 +175,39 @@ export default function Home() {
                           <span className="text-xs text-gray-500 ml-2">(Similarity: {result.score.toFixed(2)})</span>
                         </li>
                       ))}
-                   </ul>
+                    </ul>
                 </div>
               )}
             </div>
           </div>
+
+          {/* Search for Stock Data Section */}
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Search for Stock Data</h2>
+            <div className="flex w-full max-w-sm items-center space-x-2">
+              <Input type="text" placeholder="Enter a stock symbol..." value={stockSymbol} onChange={(e) => setStockSymbol(e.target.value)} className="bg-gray-900 border-gray-700" />
+              <Button onClick={handleStockSearch} disabled={isStockLoading}>{isStockLoading ? "Fetching..." : "Search Stock"}</Button>
+            </div>
+          </div>
+          
+          {/* Main Results Area */}
           <div className="border-t border-gray-800 pt-8">
-            <h2 className="text-lg font-semibold mb-2">New Search Results</h2>
-            {isLoading && <p>Loading results...</p>}
-            {!isLoading && searched && articles.length === 0 && (
-              <p>No results found for "{topic}". Please try another topic.</p>
-            )}
+            <h2 className="text-lg font-semibold mb-2">Results</h2>
+            {isLoading && <p>Loading articles...</p>}
+            {isStockLoading && <p>Loading stock data...</p>}
+            {stockError && <p className="text-red-500">{stockError}</p>}
+            
+            {/* News Article Results */}
+            {!isLoading && searched && articles.length === 0 && topic && <p>No results found for "{topic}".</p>}
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {articles.map((article) => (
-                <ResultCard
-                  key={article.url}
-                  title={article.title}
-                  description={article.description}
-                  url={article.url}
-                  imageUrl={article.urlToImage}
-                  summary={article.summary}
-                  topics={article.topics}
-                />
+                <ResultCard key={article.url} {...article} imageUrl={article.urlToImage} />
               ))}
             </div>
+            
+            {/* Stock Data Results */}
+            {stockData && <StockDataCard data={stockData} />}
+            {stockHistory.length > 0 && <StockHistoryChart data={stockHistory} />}
           </div>
         </div>
       </main>
