@@ -1,6 +1,8 @@
 <div align="center">
-  <br />
-  <h1 align="center">Autonomous AI Knowledge Worker</h1>
+  <img src="./assets/banner.svg" alt="Autonomous AI Knowledge Worker Project Banner">
+</div>
+
+<div align="center">
   <p align="center">
     An AI-powered system that autonomously researches topics, generates insights, and maintains a searchable knowledge base.
     <br />
