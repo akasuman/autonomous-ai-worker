@@ -1,8 +1,3 @@
-# The Knowledge Vessel: An Autonomous AI Knowledge Worker
-
-**The Knowledge Vessel is a full-stack web application designed to act as an automated research assistant. It fetches, processes, and summarizes information from the web, providing users with actionable insights on a professional, interactive dashboard.**
-
-![Dashboard Screenshot](https://ibb.co/ZRbjb2hf) 
 <div align="center">
   <br />
   <h1 align="center">Autonomous AI Knowledge Worker</h1>
@@ -35,33 +30,32 @@
 
 <br/>
 
-This project is a sophisticated, AI-powered system designed to operate with minimal human input. It autonomously researches topics using various news APIs, processes the data to generate summaries and keywords, and stores the results in a searchable knowledge base.
+The Knowledge Vessel is a full-stack web application designed to act as an automated research assistant. It fetches, processes, and summarizes information from the web, providing users with actionable insights on a professional, interactive dashboard.
 
 ---
 
-##  Features
+## ✨ Features
 
--   **🤖 Autonomous Research**: Fetches and processes information from multiple news sources with a resilient fallback system.
+-   **🤖 Autonomous Research**: Fetches and processes information from multiple news sources (GNews, NewsData.io, RSS) with a resilient fallback system.
 -   **📝 AI-Powered Summarization**: Utilizes Hugging Face models to generate concise, abstractive summaries for articles.
 -   **🔑 Automatic Topic Extraction**: Employs Natural Language Processing to identify and tag key topics and entities.
 -   **🧠 Vector Knowledge Base**: Stores article information in a Qdrant vector database for semantic "search by meaning" functionality.
--   **📊 Analytics Dashboard**: Provides high-level statistics on research tasks and stored documents.
+-   **📈 Financial Data Integration**: Fetches and displays detailed stock market data using the `yfinance` library.
 -   **🖥️ Modern Tech Stack**: Built with a robust FastAPI backend and a responsive Next.js frontend.
 
 ---
 
-##  Built With
-
-The project is built with a modern, scalable tech stack.
+## 🛠️ Built With
 
 -   **Frontend**: Next.js, React, TypeScript, TailwindCSS
 -   **Backend**: Python, FastAPI
 -   **Database**: PostgreSQL & Qdrant (via Docker)
 -   **AI/ML**: Hugging Face, Sentence-Transformers, TextBlob
+-   **Data Sources**: GNews API, NewsData.io API, `yfinance`, RSS Feeds
 
 ---
 
-##  Getting Started
+## 🚀 Getting Started
 
 Follow these instructions to set up and run the project on your local machine.
 
@@ -77,8 +71,8 @@ Make sure you have the following software installed on your system:
 
 1.  **Clone the Repository**
     ```sh
-    git clone https://github.com/akasuman/autonomous-ai-worker.git
-    cd Cothon_Project_Final
+    git clone [https://github.com/akasuman/autonomous-ai-worker.git](https://github.com/akasuman/autonomous-ai-worker.git)
+    cd autonomous-ai-worker
     ```
 
 2.  **Launch Databases with Docker**
@@ -88,20 +82,18 @@ Make sure you have the following software installed on your system:
     ```
 
 3.  **Backend Setup**
-    This involves setting up API keys and installing Python dependencies.
-
     * Navigate to the backend directory:
         ```sh
         cd backend
         ```
-    * Create a `.env` file for your secret keys. You will need to get keys from [GNews](https://gnews.io/), [NewsData.io](https://newsdata.io/), and [Hugging Face](https://huggingface.co/).
+    * Create a `.env` file for your secret keys. You will need keys from [GNews](https://gnews.io/), [NewsData.io](https://newsdata.io/), and [Hugging Face](https://huggingface.co/).
         * **On Windows (PowerShell):**
             ```powershell
-            copy .env.example .env
+            New-Item -Path ".env" -ItemType File
             ```
         * **On macOS/Linux:**
             ```sh
-            cp .env.example .env
+            touch .env
             ```
     * Open the new `.env` file and add your keys:
         ```env
@@ -128,7 +120,7 @@ Make sure you have the following software installed on your system:
 4.  **Frontend Setup**
     * Navigate to the frontend directory from the root folder:
         ```sh
-        cd frontend
+        cd ../frontend 
         ```
     * Install the Node.js dependencies:
         ```sh
@@ -137,14 +129,14 @@ Make sure you have the following software installed on your system:
 
 ---
 
-##  Running the Application
+## 🏃‍♀️ Running the Application
 
 You will need two separate terminals to run the backend and frontend servers simultaneously.
 
 ### Terminal 1: Run the Backend
 
 ```sh
-# Navigate to the backend directory (if not already there)
+# Navigate to the backend directory from the root
 cd backend
 
 # Activate the virtual environment if it's not already active
@@ -155,18 +147,19 @@ cd backend
 
 # Start the FastAPI server
 uvicorn app.main:app --reload
+✅ The backend should now be running at http://localhost:8000.
 
-### Terminal 2: Run the Frontend
+Terminal 2: Run the Frontend
 Bash
 
-# Navigate to the frontend directory (from the root folder)
+# Navigate to the frontend directory from the root
 cd frontend
 
 # Start the Next.js development server
 npm run dev
- The frontend should now be running at http://localhost:3000.
+✅ The frontend should now be running at http://localhost:3000.
 
- Roadmap
+🗺️ Roadmap
 [ ] Implement user authentication and role-based access.
 
 [ ] Add voice-based queries for initiating research tasks.
@@ -175,9 +168,9 @@ npm run dev
 
 [ ] Develop a more advanced analytics and visualization dashboard.
 
-**See the [open issues](https://github.com/akasuman/autonomous-ai-worker/issues) for a full list of proposed features (and known issues).**
+See the open issues for a full list of proposed features (and known issues).
 
- Contributing
+🤝 Contributing
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
@@ -192,8 +185,10 @@ Push to the Branch (git push origin feature/AmazingFeature)
 
 Open a Pull Request
 
+📜 License
+Distributed under the MIT License.
 
- Contact
-Name - suman - suman.k.332003@gmail.com
+📧 Contact
+Suman - suman.k.332003@gmail.com
 
-Project Link: https://github.com/akasuman/autonomous-ai-worker.git
+Project Link: https://github.com/akasuman/autonomous-ai-worker
