@@ -38,9 +38,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="flex h-screen bg-black text-white">
-      {/* --- ADD THE MISSING PROP HERE --- */}
       <Sidebar onTaskSelect={handleTaskSelect} refreshTrigger={false} />
-      
       <main className="flex-1 flex flex-col overflow-y-auto">
         <Header />
         <div className="p-4">
