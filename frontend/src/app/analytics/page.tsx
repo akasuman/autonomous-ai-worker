@@ -18,7 +18,6 @@ export default function AnalyticsPage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // --- CHANGE: Use the dynamic environment variable for the API URL ---
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
         const response = await fetch(`${apiUrl}/api/analytics/stats`);
         const data = await response.json();
@@ -39,7 +38,9 @@ export default function AnalyticsPage() {
 
   return (
     <div className="flex h-screen bg-black text-white">
-      <Sidebar onTaskSelect={handleTaskSelect} />
+      {/* --- ADD THE MISSING PROP HERE --- */}
+      <Sidebar onTaskSelect={handleTaskSelect} refreshTrigger={false} />
+      
       <main className="flex-1 flex flex-col overflow-y-auto">
         <Header />
         <div className="p-4">

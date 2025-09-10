@@ -9,7 +9,6 @@ import ResultCard from "@/components/ResultCard";
 import { StockDataCard } from "@/components/StockDataCard";
 import { StockHistoryChart } from "@/components/StockHistoryChart";
 
-// --- CHANGE 1 of 3: Define a specific type for the stock data object ---
 interface StockData {
   Symbol: string;
   Name: string;
@@ -53,7 +52,6 @@ export default function Home() {
   
   const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [stockSymbol, setStockSymbol] = useState("");
-  // --- CHANGE 2 of 3: Use the new StockData interface instead of 'any' ---
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [isStockLoading, setIsStockLoading] = useState(false);
   const [stockError, setStockError] = useState<string | null>(null);
@@ -146,7 +144,6 @@ export default function Home() {
         setStockHistory(historyData);
       }
     } catch (err) {
-      // --- CHANGE 3 of 3: Type the error safely instead of using 'any' ---
       if (err instanceof Error) {
         setStockError(err.message);
       } else {
@@ -199,7 +196,7 @@ export default function Home() {
             {stockError && <p className="text-red-500">{stockError}</p>}
             
             {/* News Article Results */}
-            {!isLoading && searched && articles.length === 0 && topic && <p>No results found for '{topic}'.</p>}
+            {!isLoading && searched && articles.length === 0 && topic && <p>No results found for {topic}.</p>}
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {articles.map((article) => (
                 <ResultCard key={article.url} {...article} imageUrl={article.urlToImage} />
