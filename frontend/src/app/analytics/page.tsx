@@ -30,7 +30,7 @@ export default function AnalyticsPage() {
     fetchStats();
   }, []);
 
-  const handleTaskSelect = (taskId: number) => {
+  const handleTaskSelect = (_taskId: number) => {
     // This page doesn't need to handle task selection,
     // but the Sidebar component requires the prop.
   };

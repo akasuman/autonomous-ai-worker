@@ -1,5 +1,19 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
+// --- CHANGE 1 of 2: Define a specific type for the stock data object ---
+interface StockData {
+  Symbol: string;
+  Name: string;
+  Industry: string;
+  Description: string;
+  MarketCapitalization: string;
+  PERatio: string;
+  DividendYield: string;
+  '52WeekHigh': string;
+  '52WeekLow': string;
+  AnalystTargetPrice: string;
+}
+
 // A helper component for displaying each data point
 const DataPoint = ({ label, value }: { label: string; value: string | number }) => (
   <div className="flex justify-between border-b border-gray-800 py-2">
@@ -8,7 +22,8 @@ const DataPoint = ({ label, value }: { label: string; value: string | number }) 
   </div>
 );
 
-export const StockDataCard = ({ data }: { data: any }) => {
+// --- CHANGE 2 of 2: Use the new StockData interface for the 'data' prop ---
+export const StockDataCard = ({ data }: { data: StockData }) => {
   if (!data || !data.Symbol) {
     return null;
   }

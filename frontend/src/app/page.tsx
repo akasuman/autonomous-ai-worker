@@ -9,6 +9,20 @@ import ResultCard from "@/components/ResultCard";
 import { StockDataCard } from "@/components/StockDataCard";
 import { StockHistoryChart } from "@/components/StockHistoryChart";
 
+// --- CHANGE 1 of 3: Define a specific type for the stock data object ---
+interface StockData {
+  Symbol: string;
+  Name: string;
+  Industry: string;
+  Description: string;
+  MarketCapitalization: string;
+  PERatio: string;
+  DividendYield: string;
+  '52WeekHigh': string;
+  '52WeekLow': string;
+  AnalystTargetPrice: string;
+}
+
 interface Article {
   title: string;
   description: string;
@@ -39,12 +53,12 @@ export default function Home() {
   
   const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [stockSymbol, setStockSymbol] = useState("");
-  const [stockData, setStockData] = useState<any>(null);
+  // --- CHANGE 2 of 3: Use the new StockData interface instead of 'any' ---
+  const [stockData, setStockData] = useState<StockData | null>(null);
   const [isStockLoading, setIsStockLoading] = useState(false);
   const [stockError, setStockError] = useState<string | null>(null);
   const [stockHistory, setStockHistory] = useState([]);
 
-  // --- CHANGE: Define the API URL dynamically ---
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const handleSearch = async () => {
@@ -52,6 +66,7 @@ export default function Home() {
     setIsLoading(true);
     setSearched(true);
     setArticles([]);
+    setHistoryResults([]);
     setStockData(null);
     setStockHistory([]);
     try {
@@ -130,8 +145,13 @@ export default function Home() {
         const historyData = await historyRes.json();
         setStockHistory(historyData);
       }
-    } catch (err: any) {
-      setStockError(err.message);
+    } catch (err) {
+      // --- CHANGE 3 of 3: Type the error safely instead of using 'any' ---
+      if (err instanceof Error) {
+        setStockError(err.message);
+      } else {
+        setStockError("An unknown error occurred.");
+      }
     } finally {
       setIsStockLoading(false);
     }
@@ -159,7 +179,6 @@ export default function Home() {
               <Input type="text" placeholder="Search past results by meaning..." value={historyQuery} onChange={(e) => setHistoryQuery(e.target.value)} className="bg-gray-900 border-gray-700" />
               <Button onClick={handleHistorySearch} disabled={isHistoryLoading}>{isHistoryLoading ? "Searching..." : "Search History"}</Button>
             </div>
-            {/* History results now appear in the main results area */}
           </div>
 
           {/* Search for Stock Data Section */}
