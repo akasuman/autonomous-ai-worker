@@ -179,7 +179,6 @@ export default function Home() {
               <Input type="text" placeholder="Search past results by meaning..." value={historyQuery} onChange={(e) => setHistoryQuery(e.target.value)} className="bg-gray-900 border-gray-700" />
               <Button onClick={handleHistorySearch} disabled={isHistoryLoading}>{isHistoryLoading ? "Searching..." : "Search History"}</Button>
             </div>
-            {/* History results now appear in the main results area */}
           </div>
 
           {/* Search for Stock Data Section */}
@@ -200,7 +199,7 @@ export default function Home() {
             {stockError && <p className="text-red-500">{stockError}</p>}
             
             {/* News Article Results */}
-            {!isLoading && searched && articles.length === 0 && topic && <p>No results found for "{topic}".</p>}
+            {!isLoading && searched && articles.length === 0 && topic && <p>No results found for '{topic}'.</p>}
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {articles.map((article) => (
                 <ResultCard key={article.url} {...article} imageUrl={article.urlToImage} />
