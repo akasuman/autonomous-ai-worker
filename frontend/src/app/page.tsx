@@ -44,17 +44,18 @@ export default function Home() {
   const [stockError, setStockError] = useState<string | null>(null);
   const [stockHistory, setStockHistory] = useState([]);
 
+  // --- CHANGE: Define the API URL dynamically ---
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
   const handleSearch = async () => {
     if (!topic) return;
     setIsLoading(true);
     setSearched(true);
     setArticles([]);
-    // --- CHANGE: Do not clear history results ---
-    // setHistoryResults([]); 
     setStockData(null);
     setStockHistory([]);
     try {
-      const response = await fetch(`http://localhost:8000/api/search/${topic}`);
+      const response = await fetch(`${apiUrl}/api/search/${topic}`);
       if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
       setArticles(data.articles || []);
@@ -74,7 +75,7 @@ export default function Home() {
     setStockData(null);
     setStockHistory([]);
     try {
-      const response = await fetch(`http://localhost:8000/api/tasks/${taskId}`);
+      const response = await fetch(`${apiUrl}/api/tasks/${taskId}`);
       if (!response.ok) throw new Error("Failed to fetch task details");
       const data = await response.json();
       setArticles(data.articles || []);
@@ -89,12 +90,11 @@ export default function Home() {
     if (!historyQuery) return;
     setIsHistoryLoading(true);
     setHistoryResults([]);
-     // --- CHANGE: Do not clear article results ---
-    // setArticles([]); 
+    setArticles([]);
     setStockData(null);
     setStockHistory([]);
     try {
-      const response = await fetch(`http://localhost:8000/api/search/history?q=${historyQuery}`);
+      const response = await fetch(`${apiUrl}/api/search/history?q=${historyQuery}`);
       if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
       setHistoryResults(data);
@@ -106,7 +106,6 @@ export default function Home() {
   };
 
   const handleStockSearch = async () => {
-    // This function clears all other results, which is the desired behavior
     if (!stockSymbol) return;
     setIsStockLoading(true);
     setStockError(null);
@@ -118,8 +117,8 @@ export default function Home() {
     const symbol = stockSymbol.toUpperCase();
     try {
       const [overviewRes, historyRes] = await Promise.all([
-        fetch(`http://localhost:8000/api/stock/${symbol}`),
-        fetch(`http://localhost:8000/api/stock/${symbol}/history`)
+        fetch(`${apiUrl}/api/stock/${symbol}`),
+        fetch(`${apiUrl}/api/stock/${symbol}/history`)
       ]);
       if (!overviewRes.ok) {
         const errData = await overviewRes.json();
@@ -160,25 +159,7 @@ export default function Home() {
               <Input type="text" placeholder="Search past results by meaning..." value={historyQuery} onChange={(e) => setHistoryQuery(e.target.value)} className="bg-gray-900 border-gray-700" />
               <Button onClick={handleHistorySearch} disabled={isHistoryLoading}>{isHistoryLoading ? "Searching..." : "Search History"}</Button>
             </div>
-            {/* --- CHANGE: Moved history results display here --- */}
-            <div className="mt-4">
-              {isHistoryLoading && <p>Searching knowledge base...</p>}
-              {historyResults.length > 0 && (
-                <div className="p-4 bg-gray-900 rounded-md">
-                    <h3 className="font-semibold mb-2">Similar Past Results:</h3>
-                    <ul className="list-disc pl-5 space-y-2">
-                      {historyResults.map(result => (
-                        <li key={result.id}>
-                          <a href={result.payload.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-                            {result.payload.title}
-                          </a>
-                          <span className="text-xs text-gray-500 ml-2">(Similarity: {result.score.toFixed(2)})</span>
-                        </li>
-                      ))}
-                    </ul>
-                </div>
-              )}
-            </div>
+            {/* History results now appear in the main results area */}
           </div>
 
           {/* Search for Stock Data Section */}
@@ -194,6 +175,7 @@ export default function Home() {
           <div className="border-t border-gray-800 pt-8">
             <h2 className="text-lg font-semibold mb-2">Results</h2>
             {isLoading && <p>Loading articles...</p>}
+            {isHistoryLoading && <p>Searching knowledge base...</p>}
             {isStockLoading && <p>Loading stock data...</p>}
             {stockError && <p className="text-red-500">{stockError}</p>}
             
@@ -204,6 +186,23 @@ export default function Home() {
                 <ResultCard key={article.url} {...article} imageUrl={article.urlToImage} />
               ))}
             </div>
+
+            {/* History Search Results */}
+            {historyResults.length > 0 && (
+              <div className="p-4 bg-gray-900 rounded-md">
+                  <h3 className="font-semibold mb-2">Similar Past Results:</h3>
+                  <ul className="list-disc pl-5 space-y-2">
+                    {historyResults.map(result => (
+                      <li key={result.id}>
+                        <a href={result.payload.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                          {result.payload.title}
+                        </a>
+                        <span className="text-xs text-gray-500 ml-2">(Similarity: {result.score.toFixed(2)})</span>
+                      </li>
+                    ))}
+                  </ul>
+              </div>
+            )}
             
             {/* Stock Data Results */}
             {stockData && <StockDataCard data={stockData} />}
