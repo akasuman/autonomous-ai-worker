@@ -32,4 +32,5 @@ COPY ./app /code/app
 # The command to run the application on container start.
 # This command correctly uses the $PORT environment variable
 # provided by Render and falls back to 10000 if it's not set.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${PORT:-10000}"]
+# AFTER
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
