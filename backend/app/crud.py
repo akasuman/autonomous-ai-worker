@@ -47,35 +47,41 @@ def update_document_topics(db: Session, document_id: int, topics: str):
         db.commit()
         db.refresh(db_document)
         return db_document
-        
+
 def get_db_stats(db: Session):
     total_tasks = db.query(models.Task).count()
     total_documents = db.query(models.Document).count()
-    
+
     top_topics = db.query(models.Task.topic, func.count(models.Task.topic).label('count')) \
-                     .group_by(models.Task.topic) \
-                     .order_by(func.count(models.Task.topic).desc()) \
-                     .limit(5).all()
-                     
+                       .group_by(models.Task.topic) \
+                       .order_by(func.count(models.Task.topic).desc()) \
+                       .limit(5).all()
+
     return {
         "total_tasks": total_tasks,
         "total_documents": total_documents,
         "top_topics": [{"topic": topic, "count": count} for topic, count in top_topics]
     }
 
-# --- ADDED: New function to find documents by their URLs ---
 def get_existing_document_urls(db: Session, urls: List[str]) -> List[str]:
     """
     Checks the database for a list of article URLs and returns the ones that already exist.
-    The 'url' is inside the 'content' JSON field.
     """
     if not urls:
         return []
-    
-    # Corrected syntax using .as_string() instead of .astext
+
     existing_docs = db.query(models.Document.content['url'].as_string()).filter(
         models.Document.content['url'].as_string().in_(urls)
     ).all()
-    
-    # The result is a list of tuples, e.g., [('http://url1',), ('http://url2',)], so we flatten it.
+
     return [url for url, in existing_docs]
+
+def search_documents_by_text(db: Session, query: str, limit: int = 10) -> List[models.Document]:
+    """
+    Searches documents for a query string in their summary.
+    """
+    search_query = f"%{query}%"
+
+    return db.query(models.Document).filter(
+        models.Document.summary.ilike(search_query)
+    ).limit(limit).all()

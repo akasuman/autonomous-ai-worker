@@ -9,6 +9,7 @@ import ResultCard from "@/components/ResultCard";
 import { StockDataCard } from "@/components/StockDataCard";
 import { StockHistoryChart } from "@/components/StockHistoryChart";
 
+// --- INTERFACES ---
 interface StockData {
   Symbol: string;
   Name: string;
@@ -31,13 +32,15 @@ interface Article {
   topics?: string;
 }
 
-interface HistoryResult {
+// --- MODIFIED: Renamed HistoryResult to Document and updated its structure ---
+// This now correctly matches the data sent by your backend's database search.
+interface Document {
   id: number;
-  score: number;
-  payload: {
+  content: {
     title: string;
     url: string;
-  }
+  };
+  summary: string | null;
 }
 
 export default function Home() {
@@ -47,7 +50,8 @@ export default function Home() {
   const [searched, setSearched] = useState(false);
   
   const [historyQuery, setHistoryQuery] = useState("");
-  const [historyResults, setHistoryResults] = useState<HistoryResult[]>([]);
+  // --- MODIFIED: Use the new Document interface for state ---
+  const [historyResults, setHistoryResults] = useState<Document[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   
   const [refreshTrigger, setRefreshTrigger] = useState(false);
@@ -64,14 +68,13 @@ export default function Home() {
     setIsLoading(true);
     setSearched(true);
     setArticles([]);
-    // --- MODIFIED: No longer clears history results ---
-    // setHistoryResults([]); 
     setStockData(null);
     setStockHistory([]);
     try {
       const response = await fetch(`${apiUrl}/api/search/${topic}`);
       if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
+      // Assuming the task object contains an 'articles' array
       setArticles(data.articles || []);
     } catch (error) {
       console.error("Failed to fetch:", error);
@@ -104,8 +107,6 @@ export default function Home() {
     if (!historyQuery) return;
     setIsHistoryLoading(true);
     setHistoryResults([]);
-    // --- MODIFIED: No longer clears article results ---
-    // setArticles([]);
     setStockData(null);
     setStockHistory([]);
     try {
@@ -175,25 +176,25 @@ export default function Home() {
           <div>
             <h2 className="text-lg font-semibold mb-2">Search Your Knowledge Base</h2>
             <div className="flex w-full max-w-sm items-center space-x-2">
-              <Input type="text" placeholder="Search past results by meaning..." value={historyQuery} onChange={(e) => setHistoryQuery(e.target.value)} className="bg-gray-900 border-gray-700" />
+              <Input type="text" placeholder="Search past results by keyword..." value={historyQuery} onChange={(e) => setHistoryQuery(e.target.value)} className="bg-gray-900 border-gray-700" />
               <Button onClick={handleHistorySearch} disabled={isHistoryLoading}>{isHistoryLoading ? "Searching..." : "Search History"}</Button>
             </div>
-            {/* === KNOWLEDGE BASE RESULTS MOVED HERE === */}
             <div className="mt-4">
               {isHistoryLoading && <p>Searching knowledge base...</p>}
               {historyResults.length > 0 && (
                 <div className="p-4 bg-gray-900 rounded-md">
-                    <h3 className="font-semibold mb-2">Similar Past Results:</h3>
-                    <ul className="list-disc pl-5 space-y-2">
-                      {historyResults.map(result => (
-                        <li key={result.id}>
-                          <a href={result.payload.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-                            {result.payload.title}
-                          </a>
-                          <span className="text-xs text-gray-500 ml-2">(Similarity: {result.score.toFixed(2)})</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <h3 className="font-semibold mb-2">Past Results:</h3>
+                  <ul className="list-disc pl-5 space-y-2">
+  {historyResults
+    .filter(result => result.content && result.content.url)
+    .map(result => (
+      <li key={result.id}>
+        <a href={result.content.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+          {result.content.title}
+        </a>
+      </li>
+  ))}
+</ul>
                 </div>
               )}
             </div>
@@ -223,8 +224,6 @@ export default function Home() {
               ))}
             </div>
             
-            {/* === KNOWLEDGE BASE RESULTS REMOVED FROM HERE === */}
-            
             {/* Stock Data Results */}
             {stockData && <StockDataCard data={stockData} />}
             {stockHistory.length > 0 && <StockHistoryChart data={stockHistory} />}
@@ -234,4 +233,3 @@ export default function Home() {
     </div>
   );
 }
-
