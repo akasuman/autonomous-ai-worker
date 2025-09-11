@@ -1,28 +1,35 @@
-# Stage 1: The Build Stage
+# Stage 1: The Builder Stage
 FROM python:3.11-slim as builder
 
-# Set the working directory for the build stage
-WORKDIR /app
+WORKDIR /code
 
-# Copy the requirements file
+# Create a virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy and install requirements
 COPY ./requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --only-binary :all: -r requirements.txt
 
-# Use a non-standard but often more memory-efficient install command
-# This avoids the dependency resolution engine which can be memory-heavy
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir --only-binary :all: -r requirements.txt
-
+# ---
 # Stage 2: The Final Production Stage
 FROM python:3.11-slim
 
-# Set the working directory
 WORKDIR /code
 
-# Copy the installed packages from the builder stage
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+# Copy the virtual environment from the builder stage
+COPY --from=builder /opt/venv /opt/venv
 
 # Copy the application code
-COPY ./app /code/app
+COPY ./app ./app
 
-# The command to run the application
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}
+# Set the PATH to use the virtual environment's executables
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Add a non-root user for better security
+RUN useradd --create-home appuser
+USER appuser
+
+# Command to run the application using the FULL PATH to uvicorn
+CMD ["sh", "-c", "/opt/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
