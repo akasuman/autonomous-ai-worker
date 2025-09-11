@@ -64,7 +64,8 @@ export default function Home() {
     setIsLoading(true);
     setSearched(true);
     setArticles([]);
-    setHistoryResults([]);
+    // --- MODIFIED: No longer clears history results ---
+    // setHistoryResults([]); 
     setStockData(null);
     setStockHistory([]);
     try {
@@ -103,7 +104,8 @@ export default function Home() {
     if (!historyQuery) return;
     setIsHistoryLoading(true);
     setHistoryResults([]);
-    setArticles([]);
+    // --- MODIFIED: No longer clears article results ---
+    // setArticles([]);
     setStockData(null);
     setStockHistory([]);
     try {
@@ -176,6 +178,25 @@ export default function Home() {
               <Input type="text" placeholder="Search past results by meaning..." value={historyQuery} onChange={(e) => setHistoryQuery(e.target.value)} className="bg-gray-900 border-gray-700" />
               <Button onClick={handleHistorySearch} disabled={isHistoryLoading}>{isHistoryLoading ? "Searching..." : "Search History"}</Button>
             </div>
+            {/* === KNOWLEDGE BASE RESULTS MOVED HERE === */}
+            <div className="mt-4">
+              {isHistoryLoading && <p>Searching knowledge base...</p>}
+              {historyResults.length > 0 && (
+                <div className="p-4 bg-gray-900 rounded-md">
+                    <h3 className="font-semibold mb-2">Similar Past Results:</h3>
+                    <ul className="list-disc pl-5 space-y-2">
+                      {historyResults.map(result => (
+                        <li key={result.id}>
+                          <a href={result.payload.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                            {result.payload.title}
+                          </a>
+                          <span className="text-xs text-gray-500 ml-2">(Similarity: {result.score.toFixed(2)})</span>
+                        </li>
+                      ))}
+                    </ul>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Search for Stock Data Section */}
@@ -191,34 +212,18 @@ export default function Home() {
           <div className="border-t border-gray-800 pt-8">
             <h2 className="text-lg font-semibold mb-2">Results</h2>
             {isLoading && <p>Loading articles...</p>}
-            {isHistoryLoading && <p>Searching knowledge base...</p>}
             {isStockLoading && <p>Loading stock data...</p>}
             {stockError && <p className="text-red-500">{stockError}</p>}
             
             {/* News Article Results */}
-            {!isLoading && searched && articles.length === 0 && topic && <p>No results found for {topic}.</p>}
+            {!isLoading && searched && articles.length === 0 && topic && <p>{`No results found for "${topic}".`}</p>}
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {articles.map((article) => (
                 <ResultCard key={article.url} {...article} imageUrl={article.urlToImage} />
               ))}
             </div>
-
-            {/* History Search Results */}
-            {historyResults.length > 0 && (
-              <div className="p-4 bg-gray-900 rounded-md">
-                  <h3 className="font-semibold mb-2">Similar Past Results:</h3>
-                  <ul className="list-disc pl-5 space-y-2">
-                    {historyResults.map(result => (
-                      <li key={result.id}>
-                        <a href={result.payload.url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-                          {result.payload.title}
-                        </a>
-                        <span className="text-xs text-gray-500 ml-2">(Similarity: {result.score.toFixed(2)})</span>
-                      </li>
-                    ))}
-                  </ul>
-              </div>
-            )}
+            
+            {/* === KNOWLEDGE BASE RESULTS REMOVED FROM HERE === */}
             
             {/* Stock Data Results */}
             {stockData && <StockDataCard data={stockData} />}
@@ -229,3 +234,4 @@ export default function Home() {
     </div>
   );
 }
+
