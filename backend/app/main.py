@@ -41,7 +41,7 @@ async def run_research_task(topic: str, db: Session):
 
     # Process new articles with the AI service to get summaries and topics
     # Let's process a smaller number to avoid long waits, e.g., the first 5
-    articles_to_process = new_articles[:5]
+    articles_to_process = new_articles[:2]
     processed_articles = await ai_service.process_articles_concurrently(articles_to_process)
 
     # Loop through each processed article and save it individually
